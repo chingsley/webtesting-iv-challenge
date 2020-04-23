@@ -1,0 +1,45 @@
+{
+  "name": "testingserver",
+  "version": "1.0.0",
+  "description": "Server Testing Project",
+  "main": "server.js",
+  "scripts": {
+    "start": "node -r esm src/index.js",
+    "server": "nodemon -r esm src/index.js",
+    "test": "jest --watch --verbose",
+    "seed": "npx knex seed:run",
+    "migration": "npx knex migrate:latest",
+    "migrate:undo": "npx knex migrate:rollback"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LambdaSchool/Server-Testing.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LambdaSchool/Server-Testing/issues"
+  },
+  "homepage": "https://github.com/LambdaSchool/Server-Testing#readme",
+  "devDependencies": {
+    "jest": "^23.6.0",
+    "supertest": "^3.3.0"
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "esm": "^3.2.25",
+    "express": "^4.16.4",
+    "helmet": "^3.22.0",
+    "knex": "^0.21.0",
+    "knex-cleaner": "^1.3.0",
+    "moment": "^2.24.0",
+    "morgan": "^1.10.0",
+    "mysql2": "^2.1.0",
+    "nodemon": "^2.0.3",
+    "sqlite3": "^4.1.1"
+  }
+}
