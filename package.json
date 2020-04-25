@@ -6,13 +6,13 @@
   "scripts": {
     "start": "node -r esm src/index.js",
     "server": "nodemon -r esm src/index.js",
-    "test": "jest --watch --verbose",
+    "test": "cross-env DB_ENV=testing jest --detectOpenHandles --verbose --coverage --forceExit",
+    "test:watchAll": "cross-env DB_ENV=testing jest --detectOpenHandles --watchAll --verbose",
+    "test:watch": "cross-env DB_ENV=testing jest --watch --verbose",
     "seed": "npx knex seed:run",
     "migration": "npx knex migrate:latest",
+    "migration:testdb": "npx knex migrate:latest --env testing",
     "migrate:undo": "npx knex migrate:rollback"
-  },
-  "jest": {
-    "testEnvironment": "node"
   },
   "repository": {
     "type": "git",
@@ -26,10 +26,19 @@
   },
   "homepage": "https://github.com/LambdaSchool/Server-Testing#readme",
   "devDependencies": {
-    "jest": "^23.6.0",
-    "supertest": "^3.3.0"
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/node": "^7.8.7",
+    "@babel/preset-env": "^7.9.5",
+    "cross-env": "^7.0.2",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "jest": "^25.4.0",
+    "nodemon": "^2.0.3",
+    "supertest": "^3.4.2"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "esm": "^3.2.25",
     "express": "^4.16.4",
@@ -39,7 +48,6 @@
     "moment": "^2.24.0",
     "morgan": "^1.10.0",
     "mysql2": "^2.1.0",
-    "nodemon": "^2.0.3",
     "sqlite3": "^4.1.1"
   }
 }

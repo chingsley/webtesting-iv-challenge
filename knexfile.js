@@ -5,9 +5,8 @@ const {
   MYSQL_DB,
   MYSQL_HOST,
   DB_DIALECT,
+  MYSQL_TESTDB,
 } = process.env;
-
-console.log(DB_DIALECT);
 
 module.exports = {
   development: {
@@ -27,6 +26,22 @@ module.exports = {
     pool: { min: 0, max: 7 },
   },
 
+  testing: {
+    client: DB_DIALECT,
+    connection: {
+      host: MYSQL_HOST,
+      user: MYSQL_USERNAME,
+      password: MYSQL_PASSWORD,
+      database: MYSQL_TESTDB,
+    },
+    migrations: {
+      directory: './src/data/migrations',
+    },
+    seeds: {
+      directory: './src/data/seeds',
+    },
+    pool: { min: 2, max: 7 },
+  },
   staging: {
     client: 'postgresql',
     connection: {
