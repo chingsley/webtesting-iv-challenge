@@ -7,7 +7,7 @@
     "start": "node -r esm src/index.js",
     "server": "nodemon -r esm src/index.js",
     "coverage": "cross-env DB_ENV=testing jest --detectOpenHandles --verbose --coverage --forceExit",
-    "test": "cross-env DB_ENV=testing jest --detectOpenHandles --watchAll --verbose",
+    "test": "cross-env DB_ENV=testing jest --detectOpenHandles --watchAll",
     "test:watch": "cross-env DB_ENV=testing jest --watch --verbose",
     "seed": "npx knex seed:run",
     "migration": "npx knex migrate:latest",

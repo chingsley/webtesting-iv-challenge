@@ -1,5 +1,5 @@
 import supertest from 'supertest';
-import server from '../src/api/server';
+import server from '../../src/api/server';
 
 const app = supertest(server);
 
