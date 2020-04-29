@@ -1,6 +1,7 @@
 import {
   findAll,
   findById,
+  findByField,
   add,
   edit,
   remove,
@@ -58,6 +59,19 @@ describe('User model', () => {
       const user = await findById(1);
       // expect(user.id).toBe(1);
       expect(user).toEqual(expect.objectContaining({ id: 1 }));
+      done();
+    });
+  });
+
+  describe('findById', () => {
+    it('returns the user with the marching field value', async (done) => {
+      await db('users').insert(bulkUsers);
+      const user = await findByField({ email: 'jon@stark.com' });
+      expect(user).toEqual(
+        expect.objectContaining({
+          email: 'jon@stark.com',
+        })
+      );
       done();
     });
   });

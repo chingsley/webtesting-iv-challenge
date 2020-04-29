@@ -28,4 +28,10 @@ const singleUser = {
   password: bcrypt.hashSync('unua'),
 };
 
-export { bulkUsers, singleUser, SAMPLE_BCRYPT_VALUE };
+const singleUser2 = {
+  username: 'mua2',
+  email: 'muagua2@gmail.com',
+  password: 'muanagua2.0',
+};
+
+export { bulkUsers, singleUser, singleUser2, SAMPLE_BCRYPT_VALUE };
