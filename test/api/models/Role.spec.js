@@ -9,9 +9,10 @@ import {
 import db from '../../../src/data/dbConfig';
 import { bulkRoles, singleUserRole } from '../../data/sample.roles';
 
-describe('User model', () => {
+describe('Role model', () => {
   beforeEach(async () => {
     await db.raw('SET FOREIGN_KEY_CHECKS = 0');
+    await db('users').truncate(); // delete all users to avoid foreign key restriction when trying to delete a role
     await db('roles').truncate();
     await db.raw('SET FOREIGN_KEY_CHECKS = 1');
   });
@@ -79,12 +80,15 @@ describe('User model', () => {
       done();
     });
   });
+
   describe('remove', () => {
     it('removes the role whose id is specified', async (done) => {
       await db('roles').insert(bulkRoles);
+      await db.raw('SET FOREIGN_KEY_CHECKS = 0');
       await remove(1);
       const role = await db('roles').where({ id: 1 }).first();
       expect(role).toBe(undefined);
+      await db.raw('SET FOREIGN_KEY_CHECKS = 1');
       done();
     });
   });

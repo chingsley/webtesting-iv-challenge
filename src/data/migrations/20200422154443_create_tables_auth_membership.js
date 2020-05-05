@@ -14,6 +14,7 @@ exports.up = function (knex) {
     })
     .createTable('user_roles', (tbl) => {
       tbl.increments();
+      tbl.unique(['userId', 'roleId']);
       tbl
         .integer('userId')
         .unsigned()
