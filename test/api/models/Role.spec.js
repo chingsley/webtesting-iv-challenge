@@ -9,7 +9,7 @@ import {
 import db from '../../../src/data/dbConfig';
 import { bulkRoles, singleUserRole } from '../../data/sample.roles';
 
-describe('Role model', () => {
+describe.skip('Role model', () => {
   beforeEach(async () => {
     await db.raw('SET FOREIGN_KEY_CHECKS = 0');
     await db('users').truncate(); // delete all users to avoid foreign key restriction when trying to delete a role

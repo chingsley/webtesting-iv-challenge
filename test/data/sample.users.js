@@ -8,30 +8,33 @@ const bulkUsers = [
   {
     username: 'jon',
     email: 'jon@stark.com',
-    password: bcrypt.hashSync('stark'),
+    password: 'stark',
   },
   {
     username: 'arya',
     email: 'arya@stark.com',
-    password: bcrypt.hashSync('stark'),
+    password: 'stark',
   },
   {
     username: 'sansa',
     email: 'sansa@stark.com',
-    password: bcrypt.hashSync('stark'),
+    password: 'stark',
+  },
+  {
+    username: 'mua',
+    email: 'muagua@gmail.com',
+    password: 'stark',
+  },
+  {
+    username: 'mua2',
+    email: 'muagua2@gmail.com',
+    password: 'stark',
+  },
+  {
+    email: 'ching@gmail.com',
+    username: 'chingsley',
+    password: 'mua',
   },
 ];
 
-const singleUser = {
-  username: 'mua',
-  email: 'muagua@gmail.com',
-  password: bcrypt.hashSync('unua'),
-};
-
-const singleUser2 = {
-  username: 'mua2',
-  email: 'muagua2@gmail.com',
-  password: 'muanagua2.0',
-};
-
-export { bulkUsers, singleUser, singleUser2, SAMPLE_BCRYPT_VALUE };
+export { bulkUsers, SAMPLE_BCRYPT_VALUE };

@@ -3,7 +3,7 @@ import { bulkUsers } from '../../data/sample.users';
 import { bulkRoles } from '../../data/sample.roles';
 import db from '../../../src/data/dbConfig';
 
-describe('UserRole model', () => {
+describe.skip('UserRole model', () => {
   beforeEach(async () => {
     await db.raw('SET FOREIGN_KEY_CHECKS = 0');
     await db('user_roles').truncate();

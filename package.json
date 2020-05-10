@@ -6,12 +6,13 @@
   "scripts": {
     "start": "node -r esm src/index.js",
     "server": "nodemon -r esm src/index.js",
-    "coverage": "cross-env DB_ENV=testing jest --detectOpenHandles --verbose --coverage --forceExit",
-    "test": "cross-env DB_ENV=testing jest --detectOpenHandles --watchAll",
-    "test:watch": "cross-env DB_ENV=testing jest --watch --verbose",
+    "coverage": "cross-env DB_ENV=test jest --detectOpenHandles --verbose --coverage --forceExit",
+    "test": "cross-env DB_ENV=test jest --detectOpenHandles --watchAll",
+    "test:watch": "cross-env DB_ENV=test jest --watch --verbose",
+    "test:file": "cross-env DB_ENV=test jest test/api/controllers/userController.spec.js --detectOpenHandles --watch",
     "seed": "npx knex seed:run",
     "migration": "npx knex migrate:latest",
-    "migration:testdb": "npx knex migrate:latest --env testing",
+    "migration:testdb": "npx knex migrate:latest --env test",
     "migrate:undo": "npx knex migrate:rollback"
   },
   "repository": {
@@ -49,6 +50,7 @@
     "morgan": "^1.10.0",
     "mysql2": "^2.1.0",
     "objection": "^2.1.3",
+    "response-time": "^2.3.2",
     "sqlite3": "^4.1.1"
   }
 }
