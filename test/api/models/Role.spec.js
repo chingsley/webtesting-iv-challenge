@@ -7,7 +7,7 @@ import {
   remove,
 } from '../../../src/api/models/Role';
 import db from '../../../src/data/dbConfig';
-import { bulkRoles, singleUserRole } from '../../data/sample.roles';
+import { sampleRoles } from '../../data';
 
 describe.skip('Role model', () => {
   beforeEach(async () => {
@@ -19,7 +19,7 @@ describe.skip('Role model', () => {
 
   describe('findAll', () => {
     it('returns arrray of all available roles', async (done) => {
-      await db('roles').insert(bulkRoles);
+      await db('roles').insert(sampleRoles);
       const roles = await findAll();
       expect(roles).toEqual(
         expect.arrayContaining([
@@ -40,7 +40,7 @@ describe.skip('Role model', () => {
 
   describe('findById', () => {
     it('returns the specified role', async (done) => {
-      await db('roles').insert(bulkRoles);
+      await db('roles').insert(sampleRoles);
       const role = await findById(1);
       expect(role).toEqual({
         id: 1,
@@ -52,7 +52,7 @@ describe.skip('Role model', () => {
 
   describe('findByField', () => {
     it('returns the roled matching the specified field object', async (done) => {
-      await db('roles').insert(bulkRoles);
+      await db('roles').insert(sampleRoles);
       const role = await findByField({ role: 'admin' });
       expect(role).toEqual({
         id: 2,
@@ -64,16 +64,16 @@ describe.skip('Role model', () => {
 
   describe('add', () => {
     it('adds roles to the roles table', async (done) => {
-      await add(bulkRoles);
+      await add(sampleRoles);
       const roles = await db('roles');
-      expect(roles.length).toBe(bulkRoles.length);
+      expect(roles.length).toBe(sampleRoles.length);
       done();
     });
   });
 
   describe('edit', () => {
     it('edits the role whose id is specified', async (done) => {
-      await db('roles').insert(bulkRoles);
+      await db('roles').insert(sampleRoles);
       await edit(1, { role: 'super user' });
       const { role } = await db('roles').where({ id: 1 }).first();
       expect(role).toBe('super user');
@@ -83,7 +83,7 @@ describe.skip('Role model', () => {
 
   describe('remove', () => {
     it('removes the role whose id is specified', async (done) => {
-      await db('roles').insert(bulkRoles);
+      await db('roles').insert(sampleRoles);
       await db.raw('SET FOREIGN_KEY_CHECKS = 0');
       await remove(1);
       const role = await db('roles').where({ id: 1 }).first();

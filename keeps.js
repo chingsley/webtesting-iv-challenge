@@ -86,3 +86,15 @@ const registerUser = async (req, res, next) => {
     return next(err.message);
   }
 };
+
+// // >>>>>>>>>>>>>>>>>>>>>>>>>> KNEX QUERY >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// db('notifications')
+// .whereNotIn('id', subquery1)
+// .andWhere(function() {
+// this.whereIn('user_id', subquery2)
+// .orWhereIn('event_type', subquery2_with_join)
+// .orWhereIn('category_type', subquery3)
+// })
+// .toString()
+//select * from "notifications" where "id" not in (subquery1) and ("user_id" in (subquery2) or "event_type" in (subquery2_with_join) or "category_type" in (subquery3))

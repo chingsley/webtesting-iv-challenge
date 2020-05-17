@@ -5,7 +5,7 @@ describe('isVAlidEmail function', () => {
     expect(isVAlidEmail('eneja.kc@gmail.com')).toBe(true);
     done();
   });
-  it('returns false for valid email', (done) => {
+  it('returns false for invalid email', (done) => {
     expect(isVAlidEmail('eneja...kc@gmail.com')).toBe(false);
     done();
   });

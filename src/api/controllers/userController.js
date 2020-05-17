@@ -26,9 +26,29 @@ const registerUser = async (req, res, next) => {
     })
     .catch((error) => {
       trx.rollback();
-      console.log(error);
       next(error.message);
     });
 };
 
-export { registerUser };
+const updateUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const changes = req.body;
+    const numOfUpdatedRecord = await db('users').where({ id }).update(changes);
+    if (numOfUpdatedRecord > 0) {
+      const user = await db('users').where({ id }).first();
+      return res.status(200).json({
+        message: 'user updated successfully',
+        user,
+      });
+    } else {
+      return res.status(500).json({
+        error: 'no records updated',
+      });
+    }
+  } catch (error) {
+    next(error.message);
+  }
+};
+
+export { registerUser, updateUser };

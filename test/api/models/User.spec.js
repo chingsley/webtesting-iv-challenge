@@ -7,11 +7,7 @@ import {
   remove,
 } from '../../../src/api/models/User';
 import db from '../../../src/data/dbConfig';
-import {
-  bulkUsers,
-  singleUser,
-  SAMPLE_BCRYPT_VALUE,
-} from '../../data/sample.users';
+import { sampleUsers, singleUser, SAMPLE_BCRYPT_VALUE } from '../../data';
 
 describe.skip('User model', () => {
   beforeEach(async () => {
@@ -23,7 +19,7 @@ describe.skip('User model', () => {
 
   describe('findAll', () => {
     it('returns all users in the db', async (done) => {
-      await db('users').insert(bulkUsers);
+      await db('users').insert(sampleUsers);
       const users = await findAll();
       const [jon, arya, sansa] = users;
       // console.log(jon);
@@ -55,7 +51,7 @@ describe.skip('User model', () => {
 
   describe('findById', () => {
     it('returns the user with the marching id', async (done) => {
-      await db('users').insert(bulkUsers);
+      await db('users').insert(sampleUsers);
       const user = await findById(1);
       // expect(user.id).toBe(1);
       expect(user).toEqual(expect.objectContaining({ id: 1 }));
@@ -65,7 +61,7 @@ describe.skip('User model', () => {
 
   describe('findById', () => {
     it('returns the user with the marching field value', async (done) => {
-      await db('users').insert(bulkUsers);
+      await db('users').insert(sampleUsers);
       const user = await findByField({ email: 'jon@stark.com' });
       expect(user).toEqual(
         expect.objectContaining({
@@ -91,7 +87,7 @@ describe.skip('User model', () => {
     });
 
     it('adds bulk users to the db', async (done) => {
-      const [id] = await add(bulkUsers);
+      const [id] = await add(sampleUsers);
       const newlyCreatedUsers = await db('users');
       expect(newlyCreatedUsers).toEqual(
         expect.arrayContaining([
@@ -121,7 +117,7 @@ describe.skip('User model', () => {
 
   describe('edit', () => {
     it('updates the user that matches the specified id', async (done) => {
-      await db('users').insert(bulkUsers);
+      await db('users').insert(sampleUsers);
       await edit(2, { username: 'Arya Stark' });
       const editedUser = await db('users').where({ id: 2 }).first();
       expect(editedUser).toEqual(
@@ -133,7 +129,7 @@ describe.skip('User model', () => {
 
   describe('remove', () => {
     it('removes from the db the user that matches the specifed id', async (done) => {
-      await db('users').insert(bulkUsers);
+      await db('users').insert(sampleUsers);
       await remove(2);
       const arya = await db('users').where({ id: 2 }).first();
       expect(arya).toBe(undefined);
