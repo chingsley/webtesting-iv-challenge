@@ -14,6 +14,7 @@ exports.up = function (knex) {
     })
     .createTable('user_roles', (tbl) => {
       tbl.increments();
+      tbl.unique(['userId', 'roleId']);
       tbl
         .integer('userId')
         .unsigned()
@@ -21,7 +22,7 @@ exports.up = function (knex) {
         .references('id')
         .inTable('users')
         .onUpdate('CASCADE')
-        .onDelete('RESTRICT');
+        .onDelete('CASCADE');
       tbl
         .integer('roleId')
         .unsigned()
@@ -29,7 +30,7 @@ exports.up = function (knex) {
         .references('id')
         .inTable('roles')
         .onUpdate('CASCADE')
-        .onDelete('RESTRICT');
+        .onDelete('CASCADE');
     })
     .createTable('memberships', (tbl) => {
       tbl.increments();
@@ -40,7 +41,7 @@ exports.up = function (knex) {
         .references('id')
         .inTable('users')
         .onUpdate('CASCADE')
-        .onDelete('RESTRICT');
+        .onDelete('CASCADE');
       tbl
         .integer('followerId')
         .unsigned()
@@ -48,7 +49,7 @@ exports.up = function (knex) {
         .references('id')
         .inTable('users')
         .onUpdate('CASCADE')
-        .onDelete('RESTRICT');
+        .onDelete('CASCADE');
     });
 };
 

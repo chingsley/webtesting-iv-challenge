@@ -24,7 +24,7 @@ exports.up = function (knex) {
         .references('id')
         .inTable('restaurants')
         .onUpdate('CASCADE')
-        .onDelete('RESTRICT');
+        .onDelete('CASCADE');
       tbl
         .integer('typeId')
         .unsigned()
@@ -32,7 +32,7 @@ exports.up = function (knex) {
         .references('id')
         .inTable('types')
         .onUpdate('CASCADE')
-        .onDelete('RESTRICT');
+        .onDelete('CASCADE');
     })
     .createTable('ratings', (tbl) => {
       tbl.increments();
@@ -47,7 +47,7 @@ exports.up = function (knex) {
         .references('id')
         .inTable('users')
         .onUpdate('CASCADE')
-        .onDelete('RESTRICT');
+        .onDelete('CASCADE');
       tbl
         .integer('restaurantId')
         .unsigned()

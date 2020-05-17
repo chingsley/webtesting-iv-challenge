@@ -1,3 +1,5 @@
+import User from '../models/User';
+import db from '../../data/dbConfig';
 const listItems = (arr) => {
   const str = arr.join(', ');
   const idx = str.lastIndexOf(',');
@@ -19,4 +21,6 @@ const isVAlidEmail = (mail) => {
   return false;
 };
 
-export { listItems, isVAlidEmail };
+const response400 = (res, error) => res.status(400).json({ error });
+
+export { listItems, isVAlidEmail, response400 };

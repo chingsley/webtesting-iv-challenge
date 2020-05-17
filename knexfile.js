@@ -26,7 +26,7 @@ module.exports = {
     pool: { min: 0, max: 7 },
   },
 
-  testing: {
+  test: {
     client: DB_DIALECT,
     connection: {
       host: MYSQL_HOST,

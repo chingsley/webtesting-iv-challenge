@@ -1,25 +1,16 @@
 import express from 'express';
-import { registerUser } from '../controllers/userController';
+import db from '../../data/dbConfig';
+
 import { validateInputUser } from '../middlewares/userMiddleware';
+import { registerUser, updateUser } from '../controllers/userController';
 
 const router = express.Router();
 
 router.post('/register', validateInputUser, registerUser);
-
-router.get('/', (req, res, next) => {
-  res.status(200).json({ message: 'user list...' });
-});
-
-router.get('/:id', (req, res, next) => {
-  res.send('get one user successful');
-});
-
-router.put('/:id', (req, res, next) => {
-  res.status(200).json({ message: 'successful update' });
-});
-
-router.delete('/:id', (req, res, next) => {
-  res.status(200).json({ message: 'user removed' });
+router.put('/:id', validateInputUser, updateUser);
+router.get('/', async (req, res, next) => {
+  const users = await db('users');
+  return res.status(200).json({ users });
 });
 
 export default router;
