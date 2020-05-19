@@ -1,48 +1,36 @@
-import { listItems, isVAlidEmail, response400 } from './helpers';
-
-import db from '../../data/dbConfig';
+import {
+  isVAlidEmail,
+  response400,
+  response4xx,
+  detectUnknownFields,
+  validateRequiredFields,
+  validateUniqueField,
+  validateIdParam,
+} from './helpers';
 
 const validateInputUser = async (req, res, next) => {
   try {
     const { username, email } = req.body;
+    let error = null;
 
-    const columnNames = ['username', 'email', 'password'];
-    const unknownFields = Object.keys(req.body).filter(
-      (key) => !columnNames.includes(key)
-    );
-    if (unknownFields.length > 0) {
-      return res.status(400).json({
-        error: `unknown field(s): ${unknownFields.join(', ')}`,
-      });
-    }
-    const requiredFields = ['username', 'email', 'password'];
-    const missingFields = requiredFields.filter((field) => !req.body[field]);
+    error = detectUnknownFields(req, ['username', 'email', 'password']);
+    if (error) return response400(res, error);
 
-    if (missingFields.length > 0 && req.method === 'POST') {
-      return response400(res, `missing field(s): ${listItems(missingFields)}`);
-    }
+    error = validateRequiredFields(req, ['username', 'email', 'password']);
+    if (error) return response400(res, error);
+
     if (email && !isVAlidEmail(email)) {
       return response400(res, 'You have entered an invalid email address!');
     }
 
     if (username) {
-      const user = await db('users').where({ username }).first();
-      if (user && user.id !== req.params.id) {
-        return response400(
-          res,
-          `${username} has been taken, please choose another username.`
-        );
-      }
+      error = await validateUniqueField(req, 'users', 'username');
+      if (error) return response4xx(res, 409, error);
     }
 
     if (email) {
-      const user = await db('users').where({ email }).first();
-      if (user && user.id !== req.params.id) {
-        return response400(
-          res,
-          `${email} has been taken, please choose another email.`
-        );
-      }
+      error = await validateUniqueField(req, 'users', 'email');
+      if (error) return response4xx(res, 409, error);
     }
 
     return next();
@@ -51,4 +39,9 @@ const validateInputUser = async (req, res, next) => {
   }
 };
 
-export { validateInputUser };
+const validateUserIdParam = async (req, res, next) => {
+  const { status, error } = await validateIdParam(req, 'users', 'user');
+  if (error) return response4xx(res, status, error);
+};
+
+export { validateInputUser, validateUserIdParam };

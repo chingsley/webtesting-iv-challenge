@@ -18,7 +18,8 @@
     "test:authRouter": "jest server/test/router/authRouter.spec.js --detectOpenHandles --watch",
     "test:userController": " jest test/api/controllers/userController.spec.js --detectOpenHandles --watch",
     "test:roleController": " jest test/api/controllers/roleController.spec.js --detectOpenHandles --watch",
-    "test:roleMiddleware": " jest test/api/middlewares/roleMiddleware.spec.js --detectOpenHandles --watch"
+    "test:roleMiddleware": " jest test/api/middlewares/roleMiddleware.spec.js --detectOpenHandles --watch",
+    "test:userMiddleware": " jest test/api/middlewares/userMiddleware.spec.js --detectOpenHandles --watch"
   },
   "repository": {
     "type": "git",
