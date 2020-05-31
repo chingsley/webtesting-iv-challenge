@@ -2,6 +2,10 @@ import supertest from 'supertest';
 import db from '../../../src/data/dbConfig';
 import server from '../../../src/api/server';
 import { sampleRoles, sampleUsers } from '../../data';
+import {
+  validateDataTypeUserRoleIds,
+  comfrimUserRoleExists,
+} from '../../../src/api/middlewares/roleMiddleware';
 
 const app = supertest(server);
 
@@ -79,6 +83,70 @@ describe('roleMiddleware', () => {
         `no user matches the userId of ${userId}`
       );
       done();
+    });
+  });
+  describe('validateDataTypeUserRoleIds', () => {
+    describe('try', () => {
+      it('returns 400 for non-integer data types', async (done) => {
+        try {
+          const res = await app.delete('/api/roles/stingId/stringId');
+          expect(res.status).toBe(400);
+          const errorMsg = 'roleId and userId must be positive integer values';
+          expect(res.body).toHaveProperty('error', errorMsg);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+    });
+    describe('catch', () => {
+      it('returns 500 for errors thrown in the try block', async (done) => {
+        try {
+          const req = { params: undefined };
+          const res = { body: {}, status: jest.fn() };
+          const next = jest.fn();
+          await validateDataTypeUserRoleIds(req, res, next);
+          expect(next).toHaveBeenCalled();
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+    });
+  });
+  describe('comfrimUserRoleExists', () => {
+    describe('try', () => {
+      it('returns 404 non-existent user_role', async (done) => {
+        try {
+          const sortedUsers = users.sort((user1, user2) => user2.id - user1.id);
+          const highestUserId = sortedUsers[0].id;
+          const sortedRoles = roles.sort((role1, role2) => role2.id - role1.id);
+          const highestRoleId = sortedRoles[0].id;
+          const res = await app.delete(
+            `/api/roles/${highestUserId + 1}/${highestRoleId + 1}`
+          );
+          expect(res.status).toBe(404);
+          const errorMsg = 'no such user-role was exists';
+          expect(res.body).toHaveProperty('error', errorMsg);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+    });
+    describe('catch', () => {
+      it('returns 500 for errors thrown in the try block', async (done) => {
+        try {
+          const req = { params: undefined };
+          const res = { body: {}, status: jest.fn() };
+          const next = jest.fn();
+          await comfrimUserRoleExists(req, res, next);
+          expect(next).toHaveBeenCalled();
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
     });
   });
 });

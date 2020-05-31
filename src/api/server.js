@@ -22,7 +22,6 @@ server.use('/*', (req, res) =>
 );
 
 server.use((err, req, res, next) => {
-  console.log(err);
   const error =
     process.env.DB_ENV === 'production' ? 'internal server error' : err;
   res.status(500).json({ error });

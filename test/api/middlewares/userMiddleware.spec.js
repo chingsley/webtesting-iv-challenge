@@ -2,7 +2,11 @@ import supertest from 'supertest';
 import db from '../../../src/data/dbConfig';
 import server from '../../../src/api/server';
 import { sampleRoles, sampleUsers } from '../../data/';
-
+import {
+  validateIdParam,
+  validateUserDetails,
+  comfirmIdExistsInTable,
+} from '../../../src/api/middlewares/userMiddleware';
 const app = supertest(server);
 
 describe('userMiddleware', () => {
@@ -14,117 +18,201 @@ describe('userMiddleware', () => {
     await db('roles').insert(sampleRoles);
   });
 
-  describe('validateInputUser', () => {
-    it('returns 400 error message for missing field(s)', async (done) => {
-      const res = await app
-        .post('/api/users/register')
-        .send({ email: 'ching@gmail.com' });
-      expect(res.status).toBe(400);
-      expect(res.body).toEqual({
-        error: 'username and password must have a value and cannot be null',
+  describe('validateUserDetails', () => {
+    describe('try', () => {
+      it('returns 400 error message for missing field(s)', async (done) => {
+        const res = await app
+          .post('/api/users/register')
+          .send({ email: 'ching@gmail.com' });
+        expect(res.status).toBe(400);
+        expect(res.body).toEqual({
+          error: 'username and password must have a value and cannot be null',
+        });
+        done();
       });
-      done();
-    });
-    it('returns 400 error message for empty or null field(s)', async (done) => {
-      const res = await app
-        .post('/api/users/register')
-        .send({ email: 'ching@gmail.com', username: '', password: null });
-      expect(res.status).toBe(400);
-      expect(res.body).toEqual({
-        error: 'username and password must have a value and cannot be null',
+      it('returns 400 error message for empty or null field(s)', async (done) => {
+        const res = await app
+          .post('/api/users/register')
+          .send({ email: 'ching@gmail.com', username: '', password: null });
+        expect(res.status).toBe(400);
+        expect(res.body).toEqual({
+          error: 'username and password must have a value and cannot be null',
+        });
+        done();
       });
-      done();
-    });
 
-    it('returns 400 error message for invalid email address', async (done) => {
-      const res = await app.post('/api/users/register').send({
-        email: 'mysite@.org.org',
-        username: 'chingsley',
-        password: 'mua',
+      it('returns 400 error message for invalid email address', async (done) => {
+        const res = await app.post('/api/users/register').send({
+          email: 'mysite@.org.org',
+          username: 'chingsley',
+          password: 'mua',
+        });
+        expect(res.status).toBe(400);
+        expect(res.body).toEqual({
+          error: 'You have entered an invalid email address!',
+        });
+        done();
       });
-      expect(res.status).toBe(400);
-      expect(res.body).toEqual({
-        error: 'You have entered an invalid email address!',
+
+      it('returns 409 error message for unique violation of username during POST', async (done) => {
+        await db('users').insert(sampleUsers[0]);
+        const res = await app
+          .post('/api/users/register')
+          .send({ ...sampleUsers[1], username: sampleUsers[0].username });
+        expect(res.status).toBe(409);
+        expect(res.body).toEqual({
+          error: `a record with username ${sampleUsers[0].username} already exists. Duplicate value is not allowed for username`,
+        });
+        done();
       });
-      done();
-    });
 
-    it('returns 409 error message for unique violation of username during POST', async (done) => {
-      await db('users').insert(sampleUsers[0]);
-      const res = await app
-        .post('/api/users/register')
-        .send({ ...sampleUsers[1], username: sampleUsers[0].username });
-      expect(res.status).toBe(409);
-      expect(res.body).toEqual({
-        error: `a record with username ${sampleUsers[0].username} already exists. Duplicate value is not allowed for username`,
+      it('returns 409 error for unique violation of username during PUT', async (done) => {
+        const [user1, user2] = sampleUsers;
+        await db('users').insert(user1);
+        const [user2Id] = await db('users').insert(user2);
+        const res = await app
+          .put(`/api/users/${user2Id}`)
+          .send({ username: user1.username });
+        expect(res.status).toBe(409);
+        expect(res.body).toHaveProperty(
+          'error',
+          `a record with username ${sampleUsers[0].username} already exists. Duplicate value is not allowed for username`
+        );
+        done();
       });
-      done();
-    });
 
-    it('returns 409 error for unique violation of username during PUT', async (done) => {
-      await db('users').insert(sampleUsers[0]);
-      const res = await app
-        .put('/api/users/register')
-        .send({ username: sampleUsers[0].username });
-      expect(res.status).toBe(409);
-      expect(res.body).toHaveProperty(
-        'error',
-        `a record with username ${sampleUsers[0].username} already exists. Duplicate value is not allowed for username`
-      );
-      done();
-    });
-
-    it('returns 409 error message for unique violation of email during POST', async (done) => {
-      await db('users').insert(sampleUsers[0]);
-      const res = await app
-        .post('/api/users/register')
-        .send({ ...sampleUsers[1], email: sampleUsers[0].email });
-      expect(res.status).toBe(409);
-      expect(res.body).toEqual({
-        error: `a record with email ${sampleUsers[0].email} already exists. Duplicate value is not allowed for email`,
+      it('returns 409 error message for unique violation of email during POST', async (done) => {
+        await db('users').insert(sampleUsers[0]);
+        const res = await app
+          .post('/api/users/register')
+          .send({ ...sampleUsers[1], email: sampleUsers[0].email });
+        expect(res.status).toBe(409);
+        expect(res.body).toEqual({
+          error: `a record with email ${sampleUsers[0].email} already exists. Duplicate value is not allowed for email`,
+        });
+        done();
       });
-      done();
-    });
 
-    it('returns 409 error for unique violation of email during PUT', async (done) => {
-      await db('users').insert(sampleUsers[0]);
-      const res = await app
-        .put('/api/users/register')
-        .send({ email: sampleUsers[0].email });
-      expect(res.status).toBe(409);
-      expect(res.body).toHaveProperty(
-        'error',
-        `a record with email ${sampleUsers[0].email} already exists. Duplicate value is not allowed for email`
-      );
-      done();
-    });
-
-    it('returns 400 error if there are unknown fields during POST', async (done) => {
-      const res = await app.post('/api/users/register').send({
-        emai: 'kc@gmail.com',
-        usname: 'kc',
-        password: 'testing',
+      it('returns 409 error for unique violation of email during PUT', async (done) => {
+        const [user1, user2] = sampleUsers;
+        await db('users').insert(user1);
+        const [user2Id] = await db('users').insert(user2);
+        const res = await app
+          .put(`/api/users/${user2Id}`)
+          .send({ email: user1.email });
+        expect(res.status).toBe(409);
+        expect(res.body).toHaveProperty(
+          'error',
+          `a record with email ${sampleUsers[0].email} already exists. Duplicate value is not allowed for email`
+        );
+        done();
       });
-      expect(res.status).toBe(400);
-      expect(res.body).toHaveProperty(
-        'error',
-        'unknown field(s): emai, usname'
-      );
-      done();
-    });
 
-    it('returns 400 error if there are unknown fields during PUT', async (done) => {
-      const [id] = await db('users').insert(sampleUsers[0]);
-      const res = await app.put(`/api/users/${id}`).send({
-        emai: 'kc@gmail.com',
-        usname: 'kc',
+      it('returns 400 error if there are unknown fields during POST', async (done) => {
+        const res = await app.post('/api/users/register').send({
+          emai: 'kc@gmail.com',
+          usname: 'kc',
+          password: 'testing',
+        });
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty(
+          'error',
+          'unknown field(s): emai, usname'
+        );
+        done();
       });
-      expect(res.status).toBe(400);
-      expect(res.body).toHaveProperty(
-        'error',
-        'unknown field(s): emai, usname'
-      );
-      done();
+
+      it('returns 400 error if there are unknown fields during PUT', async (done) => {
+        const [id] = await db('users').insert(sampleUsers[0]);
+        const res = await app.put(`/api/users/${id}`).send({
+          emai: 'kc@gmail.com',
+          usname: 'kc',
+        });
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty(
+          'error',
+          'unknown field(s): emai, usname'
+        );
+        done();
+      });
+    });
+    describe('catch', () => {
+      it('returns 500 for errors caught in the try block', async (done) => {
+        try {
+          const req = { body: undefined };
+          const res = { body: {}, status: jest.fn() };
+          const next = jest.fn();
+          await validateUserDetails(req, res, next);
+          expect(next).toHaveBeenCalled();
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+    });
+  });
+
+  describe('validateIdParam', () => {
+    describe('try', () => {
+      it('returns 400 error for non integer data types', async (done) => {
+        try {
+          const res = await app
+            .put('/api/users/xxxx')
+            .send({ username: 'king' });
+          expect(res.status).toBe(400);
+          const errorMsg = "'xxxx' is not a valid user id";
+          expect(res.body).toHaveProperty('error', errorMsg);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+    });
+    describe('catch', () => {
+      it('returns 500 for errors thrown in the try block', async (done) => {
+        try {
+          const res = { body: {}, status: jest.fn() };
+          const req = { params: undefined };
+          const next = jest.fn();
+          await validateIdParam(res, req, next);
+          expect(next).toHaveBeenCalled();
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+    });
+  });
+  describe('comfirmIdExistsInTable', () => {
+    describe('try', () => {
+      it('returns 400 error for non integer data types', async (done) => {
+        try {
+          const [id] = await db('users').insert(sampleUsers[1]);
+          const res = await app
+            .put(`/api/users/${id * 10}`)
+            .send({ username: 'king' });
+          expect(res.status).toBe(404);
+          const errorMsg = 'id 10 not found for any users';
+          expect(res.body).toHaveProperty('error', errorMsg);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+    });
+    describe('catch', () => {
+      it('returns 500 for errors thrown in the try block', async (done) => {
+        try {
+          const res = { body: {}, status: jest.fn() };
+          const req = { params: undefined };
+          const next = jest.fn();
+          await comfirmIdExistsInTable('users')(res, req, next);
+          expect(next).toHaveBeenCalled();
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
     });
   });
 });

@@ -1,4 +1,4 @@
-import { response400 } from '../middlewares/helpers';
+import { response400, isPositiveInteger } from '../middlewares/helpers';
 import db from '../../data/dbConfig';
 import { restart } from 'nodemon';
 
@@ -55,4 +55,37 @@ const validateRoleAssigment = async (req, res, next) => {
   }
 };
 
-export { validateRoleAssigment };
+const validateDataTypeUserRoleIds = (req, res, next) => {
+  try {
+    const { userId, roleId } = req.params;
+    if (!isPositiveInteger(userId) || !isPositiveInteger(roleId)) {
+      const error = 'roleId and userId must be positive integer values';
+      return res.status(400).json({ error });
+    }
+
+    return next();
+  } catch (error) {
+    return next(error.message);
+  }
+};
+
+const comfrimUserRoleExists = async (req, res, next) => {
+  try {
+    const { userId, roleId } = req.params;
+    const [userRole] = await db('user_roles').where({ userId, roleId });
+    if (!userRole) {
+      const error = 'no such user-role was exists';
+      return res.status(404).json({ error });
+    }
+
+    return next();
+  } catch (error) {
+    return next(error.message);
+  }
+};
+
+export {
+  validateRoleAssigment,
+  validateDataTypeUserRoleIds,
+  comfrimUserRoleExists,
+};

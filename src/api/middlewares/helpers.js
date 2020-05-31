@@ -124,20 +124,6 @@ const validateUniqueField = async (req, tableName, field) => {
   return error;
 };
 
-const validateIdParam = async (req, tableName, modelName) => {
-  const { id } = req.params;
-  if (!isPositiveInteger(id)) {
-    return { status: 400, error: `'${id}' is not a valid ${modelName} id` };
-  }
-
-  const record = await db(tablename).where({ id }).first();
-  if (!record) {
-    return { status: 404, error: `no ${modelName} matches the id of ${id}` };
-  }
-
-  return { status: 'ok', error: null };
-};
-
 export {
   listItems,
   isVAlidEmail,
@@ -151,5 +137,5 @@ export {
   validateStringTypes,
   validateUniqueField,
   validateDate,
-  validateIdParam,
+  isPositiveInteger,
 };
