@@ -2,7 +2,20 @@ import User from '../models/User';
 import db from '../../data/dbConfig';
 import moment from 'moment';
 
-const listItems = (arr) => {
+export const joiValidate = async (schema, req) => {
+  try {
+    await schema.validateAsync({
+      ...req.body,
+      ...req.query,
+      ...req.params,
+    });
+    return null;
+  } catch (error) {
+    return error.message;
+  }
+};
+
+export const listItems = (arr) => {
   const str = arr.join(', ');
   const idx = str.lastIndexOf(',');
   let result = '';
@@ -16,10 +29,11 @@ const listItems = (arr) => {
   return result;
 };
 
-const response400 = (res, error) => res.status(400).json({ error });
-const response4xx = (res, status, error) => res.status(status).json({ error });
+export const response400 = (res, error) => res.status(400).json({ error });
+export const response4xx = (res, status, error) =>
+  res.status(status).json({ error });
 
-const isVAlidEmail = (mail) => {
+export const isVAlidEmail = (mail) => {
   if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
     return true;
   } else {
@@ -27,7 +41,7 @@ const isVAlidEmail = (mail) => {
   }
 };
 
-const isValidPhoneNumber = (phoneNumber) => {
+export const isValidPhoneNumber = (phoneNumber) => {
   if (/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/g.test(phoneNumber)) {
     return true;
   } else {
@@ -35,7 +49,7 @@ const isValidPhoneNumber = (phoneNumber) => {
   }
 };
 
-const isValidDate = (date) => {
+export const isValidDate = (date) => {
   const regExp = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;
 
   return (
@@ -44,7 +58,7 @@ const isValidDate = (date) => {
   );
 };
 
-const validateDate = (req, field) => {
+export const validateDate = (req, field) => {
   let error = null;
   const date = req.body[field];
   const regExp = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;
@@ -61,7 +75,7 @@ const validateDate = (req, field) => {
   return error;
 };
 
-const detectUnknownFields = (req, validColumnNames) => {
+export const detectUnknownFields = (req, validColumnNames) => {
   const unknownFields = Object.keys(req.body).filter(
     (key) => !validColumnNames.includes(key)
   );
@@ -72,7 +86,7 @@ const detectUnknownFields = (req, validColumnNames) => {
   return error;
 };
 
-const validateRequiredFields = (req, requiredFields) => {
+export const validateRequiredFields = (req, requiredFields) => {
   const missingFields = requiredFields.filter((field) => !req.body[field]);
   const error =
     missingFields.length > 0 && req.method === 'POST'
@@ -81,12 +95,12 @@ const validateRequiredFields = (req, requiredFields) => {
   return error;
 };
 
-const isPositiveInteger = (value) => {
+export const isPositiveInteger = (value) => {
   if (typeof value === 'boolean') return false;
   return Number.isInteger(Number(value)) && Number(value) > 0;
 };
 
-const validateIntegerDataTypes = (req, arrOfFields) => {
+export const validateIntegerDataTypes = (req, arrOfFields) => {
   const invalidFields = arrOfFields.filter((field) => {
     return req.body[field] !== undefined && !isPositiveInteger(req.body[field]);
   });
@@ -97,10 +111,10 @@ const validateIntegerDataTypes = (req, arrOfFields) => {
   return error;
 };
 
-const isString = (value) =>
+export const isString = (value) =>
   typeof value === 'string' && Number.isNaN(Number(value));
 
-const validateStringTypes = (req, stringFields) => {
+export const validateStringTypes = (req, stringFields) => {
   const invalidFields = stringFields.filter(
     (field) => req.body[field] !== undefined && !isString(req.body[field])
   );
@@ -110,7 +124,7 @@ const validateStringTypes = (req, stringFields) => {
     : null;
 };
 
-const validateUniqueField = async (req, tableName, field) => {
+export const validateUniqueField = async (req, tableName, field) => {
   let error = null;
   const value = req.body[field];
   const record = await db(tableName)
@@ -122,20 +136,4 @@ const validateUniqueField = async (req, tableName, field) => {
   }
 
   return error;
-};
-
-export {
-  listItems,
-  isVAlidEmail,
-  isValidPhoneNumber,
-  isValidDate,
-  response400,
-  response4xx,
-  validateRequiredFields,
-  validateIntegerDataTypes,
-  detectUnknownFields,
-  validateStringTypes,
-  validateUniqueField,
-  validateDate,
-  isPositiveInteger,
 };

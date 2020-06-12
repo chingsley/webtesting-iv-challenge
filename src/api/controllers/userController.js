@@ -4,7 +4,10 @@ import db from '../../data/dbConfig';
 
 const registerUser = async (req, res, next) => {
   const user = req.body;
-  const hashedPassword = bcrypt.hashSync(user.password, 12);
+  const hashedPassword = bcrypt.hashSync(
+    user.password,
+    Number(process.env.BCRYPT_SALT_VALUE)
+  );
   user.password = hashedPassword;
 
   const trx = await db.transaction();

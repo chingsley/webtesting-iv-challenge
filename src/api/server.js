@@ -10,7 +10,7 @@ server.use(helmet());
 server.use(responseTime());
 server.use(
   morgan('tiny', {
-    skip: () => (process.env.DB_ENV === 'testing' ? true : false),
+    skip: () => (process.env.DB_ENV === 'test' ? true : false),
   })
 );
 

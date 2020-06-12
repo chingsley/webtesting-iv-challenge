@@ -15,7 +15,7 @@ const validateUserDetails = async (req, res, next) => {
     const { username, email, password } = req.body;
     let error = null;
 
-    if (password && req.method === 'PUT') {
+    if (password && req.method !== 'POST') {
       return res.status(400).json({
         error:
           'invalid parameter password; please use the password reset endpont',

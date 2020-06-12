@@ -3,7 +3,10 @@ import bcrypt from 'bcryptjs';
 // jest.mock('bcryptjs');
 // const SAMPLE_BCRYPT_VALUE = '$209892##348928982080';
 // bcrypt.hashSync = jest.fn(() => SAMPLE_BCRYPT_VALUE);
-const password = bcrypt.hashSync('stark', 12);
+const password = bcrypt.hashSync(
+  'testing',
+  Number(process.env.BCRYPT_SALT_VALUE)
+);
 
 const sampleUsers = [
   {
