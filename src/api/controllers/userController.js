@@ -3,10 +3,11 @@ import User from '../models/User';
 import db from '../../data/dbConfig';
 
 const registerUser = async (req, res, next) => {
-  const { username, email } = req.body;
-  // try {
   const user = req.body;
-  const hashedPassword = bcrypt.hashSync(user.password, 12);
+  const hashedPassword = bcrypt.hashSync(
+    user.password,
+    Number(process.env.BCRYPT_SALT_VALUE)
+  );
   user.password = hashedPassword;
 
   const trx = await db.transaction();
@@ -16,12 +17,12 @@ const registerUser = async (req, res, next) => {
       const { id: roleId } = await db('roles').where({ role: 'user' }).first();
       await trx('user_roles').insert({ userId: ids[0], roleId });
       await trx.commit();
-      const [newUser] = await User.query()
+      const [{ id, username, email, roles }] = await User.query()
         .where('id', ids[0])
         .withGraphFetched('roles');
       return res.status(201).json({
         message: 'registration completed successfully!',
-        newUser,
+        user: { id, username, email, roles },
       });
     })
     .catch((error) => {
@@ -32,14 +33,17 @@ const registerUser = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
   try {
-    const { id } = req.params;
     const changes = req.body;
-    const numOfUpdatedRecord = await db('users').where({ id }).update(changes);
+    const numOfUpdatedRecord = await db('users')
+      .where({ id: req.params.id })
+      .update(changes);
     if (numOfUpdatedRecord > 0) {
-      const user = await db('users').where({ id }).first();
+      const { id, username, email } = await db('users')
+        .where({ id: req.params.id })
+        .first();
       return res.status(200).json({
         message: 'user updated successfully',
-        user,
+        user: { id, username, email },
       });
     } else {
       return res.status(500).json({

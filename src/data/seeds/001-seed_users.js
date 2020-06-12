@@ -1,6 +1,9 @@
 const bcrypt = require('bcryptjs');
 
-const hashedPassword = bcrypt.hashSync('stark', 10);
+const hashedPassword = bcrypt.hashSync(
+  'testing',
+  Number(process.env.BCRYPT_SALT_VALUE)
+);
 
 exports.seed = function (knex) {
   return knex('users').insert([

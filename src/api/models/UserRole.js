@@ -13,7 +13,7 @@ class UserRole extends Model {
     const Role = require('./Role');
     return {
       users: {
-        relation: Model.oneToManyRelation,
+        relation: Model.HasManyRelation,
         modelClass: User,
         join: {
           from: 'user_roles.userId',
@@ -21,7 +21,7 @@ class UserRole extends Model {
         },
       },
       roles: {
-        relation: Model.oneToManyRelation,
+        relation: Model.HasManyRelation,
         modelClass: Role,
         join: {
           from: 'user_roles.roleId',

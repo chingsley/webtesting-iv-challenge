@@ -1,7 +1,11 @@
 import express from 'express';
 import db from '../../data/dbConfig';
 import { assignRole, deleteRole } from '../controllers/roleController';
-import { validateRoleAssigment } from '../middlewares/roleMiddleware';
+import {
+  validateRoleAssigment,
+  validateDataTypeUserRoleIds,
+  comfrimUserRoleExists,
+} from '../middlewares/roleMiddleware';
 
 const router = express.Router();
 
@@ -12,6 +16,11 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', validateRoleAssigment, assignRole);
 
-router.delete('/:userId/:roleId', deleteRole);
+router.delete(
+  '/:userId/:roleId',
+  validateDataTypeUserRoleIds,
+  comfrimUserRoleExists,
+  deleteRole
+);
 
 export default router;

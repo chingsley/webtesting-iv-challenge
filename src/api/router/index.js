@@ -1,12 +1,14 @@
 import express from 'express';
 import userRouter from './userRouter';
-// import authRouter from './authRouter';
+import authrouter from './authRouter';
 import rolesRouter from './rolesRouter';
+import restaurantRouter from './restaurantRouter';
 
 const router = express.Router();
 
+router.use('/auth', authrouter);
 router.use('/users', userRouter);
-// router.use('/auth', authRouter);
 router.use('/roles', rolesRouter);
+router.use('/restaurants', restaurantRouter);
 
 export default router;
